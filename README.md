@@ -2,6 +2,8 @@
 Minimal project to reproduce the issue that Azure SecretClient doesn't obey
 proxy settings for login token acquisition.
 
+https://github.com/Azure/azure-sdk-for-net/issues/43038
+
 We can configure the SecretClientOptions.Transport with a suitable proxy, and
 requests to the Azure KeyVault obey this proxy.  However, requests from within
 SecretClient to obtain login tokens _do not_ obey the proxy, and thus they fail
