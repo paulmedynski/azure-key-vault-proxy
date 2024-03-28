@@ -270,8 +270,20 @@ public sealed class KeyVaultProxy : IDisposable
 
     TokenCredential credential =
         _secret is not null
-        ? new ClientSecretCredential(_tenantId, _appId, _secret)
-        : new ClientCertificateCredential(_tenantId, _appId, _certPath);
+        ? new ClientSecretCredential(
+            _tenantId, _appId, _secret,
+            // Supply the same transport as the SecretClient, which will
+            // configure a proxy if necessary.
+            //
+            // This fixes the issue described here:
+            //
+            // https://github.com/Azure/azure-sdk-for-net/issues/43038
+            // 
+            new(){ Transport = secretOptions.Transport })
+        : new ClientCertificateCredential(
+            _tenantId, _appId, _certPath,
+            // Same transport as the SecretClient.
+            new(){ Transport = secretOptions.Transport });
     
     log.LogInformation(
       $"Creating SecretClient for vault URL={_kvUrl} tenantId={_tenantId} "
